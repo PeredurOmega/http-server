@@ -55,7 +55,7 @@ abstract class Method(var client: Client) {
         if (path == "/") path = "/get/html/index.html"
         return try {
             setResponseHeaderFromRequestedFile()
-            client.appendBytes(File(getSysPath(path)).readBytes())
+            client.writeFile(File(getSysPath(path)))
             true
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
@@ -102,6 +102,7 @@ abstract class Method(var client: Client) {
 
         @Throws(UnknownMethodException::class)
         fun factory(type: String?, client: Client): Method {
+            println("TYPE $type")
             return when (type?.lowercase(Locale.getDefault())) {
                 "get" -> Get(client)
                 "post" -> Post(client)

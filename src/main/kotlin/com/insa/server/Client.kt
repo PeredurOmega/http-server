@@ -1,10 +1,8 @@
 package com.insa.server
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.PrintWriter
+import java.io.*
 import java.net.Socket
+import java.nio.file.Files
 import java.util.*
 
 /**
@@ -14,6 +12,7 @@ class Client(s: Socket) {
     private val socket: Socket
     private val reader: BufferedReader
     private val out: PrintWriter
+    private val outputStream: OutputStream
 
     /**
      * method - Type of the requested method.
@@ -93,8 +92,23 @@ class Client(s: Socket) {
         out.println(str)
     }
 
-    fun appendBytes(content: ByteArray) {
-        out.write(String(content))
+    fun writeFile(file: File) {
+        //Files.copy(inputStream.toPath(), socket.getOutputStream())
+        var count: Int
+        outputStream.write("HTTP/1.1 200 OK\n".toByteArray())
+        outputStream.write("Content-Type: ${Files.probeContentType(file.toPath())};\n".toByteArray())
+        outputStream.write("\n".toByteArray())
+        //Files.copy(inputStream.toPath(), outputStream)
+        val buffer = ByteArray(16000) // or 4096, or more
+        val isp = file.inputStream()
+        while (isp.read(buffer).also { count = it } > 0) {
+            outputStream.write(buffer, 0, count)
+            //out.write(buffer.toString(Charset.defaultCharset()), 0, count)
+        }
+
+        outputStream.flush()
+        outputStream.close()
+
     }
 
     /**
@@ -117,6 +131,7 @@ class Client(s: Socket) {
         println("[Client] Handling new user - " + s.inetAddress.hostAddress + ":" + s.port)
         socket = s
         reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-        out = PrintWriter(socket.getOutputStream())
+        outputStream = socket.getOutputStream()
+        out = PrintWriter(outputStream)
     }
 }

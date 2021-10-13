@@ -2,8 +2,6 @@ package com.insa.server.methods
 
 import com.insa.server.Client
 import com.insa.server.ResponseStatus
-import java.util.HashMap
-import kotlin.Throws
 import java.io.IOException
 
 class Post(c: Client) : Method(c) {
@@ -12,12 +10,9 @@ class Post(c: Client) : Method(c) {
     @Throws(IOException::class)
     override fun execute() {
         if (retrieveParams()) {
-            if (sendFile()) {
-                printParameters(parameters, "POST - Data from the form:")
-                printQueryString()
-            } else {
-                println("[Post] Not found file.")
-            }
+            setResponseHeaderFromRequestedFile()
+            printParameters(parameters, "POST - Data from the form:")
+            printQueryString()
         } else {
             client.setResponseHeader(ResponseStatus.NO_CONTENT, null)
         }

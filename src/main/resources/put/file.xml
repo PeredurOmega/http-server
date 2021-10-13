@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <firstName>Rack</firstName>
+  <lastName>Jackon</lastName>
+  <gender>man</gender>
+  <age>24</age>
+  <address>
+    <streetAddress>126</streetAddress>
+    <city>San Jone</city>
+    <state>CA</state>
+    <postalCode>394221</postalCode>
+  </address>
+  <phoneNumbers>
+    <type>home</type>
+    <number>7383627627</number>
+  </phoneNumbers>
+</root>
