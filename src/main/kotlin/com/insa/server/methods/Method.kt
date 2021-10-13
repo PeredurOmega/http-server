@@ -38,9 +38,7 @@ abstract class Method(var client: Client) {
     @Throws(IOException::class)
     protected fun sendFile(): Boolean {
         var path = client.retrieveRequestHeader()["path"] ?: throw NoPathProvided()
-        if (path == "/") {
-            path = "/html/index.html"
-        }
+        if (path == "/") path = "/get/html/index.html"
         return try {
             val fileReader = readFile(path)
 
@@ -107,6 +105,7 @@ abstract class Method(var client: Client) {
                 "post" -> Post(client)
                 "put" -> Put(client)
                 "delete" -> Delete(client)
+                "head" -> Head(client)
                 else -> throw UnknownMethodException(type ?: "null")
             }
         }
