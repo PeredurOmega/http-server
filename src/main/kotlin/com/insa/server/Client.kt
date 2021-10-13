@@ -93,6 +93,10 @@ class Client(s: Socket) {
         out.println(str)
     }
 
+    fun appendBytes(content: ByteArray) {
+        out.write(String(content))
+    }
+
     /**
      * Close connection with the user.
      */

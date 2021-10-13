@@ -16,6 +16,7 @@ class Put(c: Client?) : Method(c!!) {
             val fileIsNew = writeFile(path, data)
             client.setResponseHeader(if (fileIsNew) ResponseStatus.CREATED else ResponseStatus.OK, null)
         } catch (e: Exception) {
+            e.printStackTrace()
             client.setResponseHeader(ResponseStatus.INTERNAL_ERROR, null)
         }
     }

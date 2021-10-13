@@ -35,31 +35,33 @@ abstract class Method(var client: Client) {
         } else println("[Method] No query string.")
     }
 
+    protected fun setResponseHeaderFromRequestedFile(){
+        val extension =
+            client.retrieveRequestHeader()["path"]?.split(Regex("[/|.]"))?.last()?.lowercase() ?: throw NoPathProvided()
+        when (extension) {
+            "404" -> client.setResponseHeader(ResponseStatus.NOT_FOUND, null)
+            "png" -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: image/png;\n")
+            "svg" -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: image/svg;\n")
+            "pdf" -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: application/pdf\n")
+            "mp3" -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: audio/mpeg;\n")
+            "mp4" -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: video/webm;\n")
+            else -> client.setResponseHeader(ResponseStatus.OK, "Content-Type: text/html; charset=utf-8\n")
+        }
+    }
+
     @Throws(IOException::class)
     protected fun sendFile(): Boolean {
         var path = client.retrieveRequestHeader()["path"] ?: throw NoPathProvided()
         if (path == "/") path = "/get/html/index.html"
         return try {
-            val fileReader = readFile(path)
-
-            client.setResponseHeader(ResponseStatus.OK, "Content-Type: text/html\r\n")
-            while (fileReader.ready()) {
-                client.appendResponseLine(fileReader.readLine())
-            }
+            setResponseHeaderFromRequestedFile()
+            client.appendBytes(File(getSysPath(path)).readBytes())
             true
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
             client.setResponseHeader(ResponseStatus.NOT_FOUND, null)
             false
         }
-    }
-
-    @Throws(FileNotFoundException::class)
-    protected fun readFile(webPath: String): BufferedReader {
-        val fileReader = FileReader(getSysPath(webPath))
-        val reader = BufferedReader(fileReader)
-        println("[Method] File $webPath loaded.")
-        return reader
     }
 
     init {
